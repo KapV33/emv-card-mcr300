@@ -47,6 +47,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        tech: {
+          panel: "hsl(var(--tech-panel))",
+          button: "hsl(var(--tech-button))",
+          "button-hover": "hsl(var(--tech-button-hover))",  
+          success: "hsl(var(--tech-success))",
+          warning: "hsl(var(--tech-warning))",
+          error: "hsl(var(--tech-error))",
+          status: "hsl(var(--tech-status))",
+          track: "hsl(var(--tech-track))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
