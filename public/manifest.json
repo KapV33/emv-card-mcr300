@@ -1,6 +1,6 @@
 {
-  "name": "EMV Card Simulator",
-  "short_name": "EMV Simulator",
+  "name": "EMV Card Reader Writer",
+  "short_name": "EMV Reader",
   "description": "Professional EMV Card Reader/Writer Software",
   "start_url": "/",
   "display": "standalone",

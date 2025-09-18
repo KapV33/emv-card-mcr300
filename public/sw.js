@@ -1,4 +1,4 @@
-const CACHE_NAME = 'emv-simulator-v1';
+const CACHE_NAME = 'emv-reader-v1';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
