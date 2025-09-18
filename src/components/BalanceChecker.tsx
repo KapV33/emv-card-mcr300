@@ -39,7 +39,8 @@ const BalanceChecker: React.FC<BalanceCheckerProps> = ({ onClose, track1, track2
 
     setIsChecking(true);
     
-    // Simulate balance checking process
+    // Simulate balance checking process (6-10 seconds as requested)
+    const loadingTime = Math.floor(Math.random() * (10000 - 6000 + 1)) + 6000;
     setTimeout(() => {
       const newBalance = generateRandomBalance();
       setBalance(newBalance);
@@ -51,7 +52,7 @@ const BalanceChecker: React.FC<BalanceCheckerProps> = ({ onClose, track1, track2
         description: `Current balance: £${newBalance.toLocaleString()}`,
         duration: 5000,
       });
-    }, 2000);
+    }, loadingTime);
   };
 
   const formatCurrency = (amount: number) => {

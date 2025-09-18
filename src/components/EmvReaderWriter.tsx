@@ -15,7 +15,11 @@ import BalanceChecker from '@/components/BalanceChecker';
 const EmvReaderWriter = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState("MCR300-EMV-WR");
+  const [isScanning, setIsScanning] = useState(false);
+  const [devicesFound, setDevicesFound] = useState<string[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState("");
+  const [licenseKey, setLicenseKey] = useState("");
+  const [licenseValid, setLicenseValid] = useState(false);
   const [cardData, setCardData] = useState({
     title: "",
     pin: "",
@@ -47,15 +51,30 @@ const EmvReaderWriter = () => {
   const [showBalanceChecker, setShowBalanceChecker] = useState(false);
 
   useEffect(() => {
-    // Simulate device detection
+    // No initial device detection
+  }, []);
+
+  const handleScanDevices = async () => {
+    setIsScanning(true);
+    setDevicesFound([]);
+    
+    // Simulate scanning for 3 seconds
     setTimeout(() => {
+      setDevicesFound(["MCR300-EMV-WR"]);
+      setSelectedDevice("MCR300-EMV-WR");
+      setIsScanning(false);
       toast({
-        title: "Device Detection",
+        title: "Device Found",
         description: "MCR300-EMV-WR detected and ready",
         duration: 3000,
       });
-    }, 1000);
-  }, []);
+    }, 3000);
+  };
+
+  const handleLicenseKeyChange = (value: string) => {
+    setLicenseKey(value);
+    setLicenseValid(value === "7G2FRG24EE4!FBE304BTHR");
+  };
 
   const handleConnect = async () => {
     setIsConnecting(true);
@@ -169,18 +188,38 @@ const EmvReaderWriter = () => {
                     <Usb className="h-5 w-5 text-tech-status" />
                     <Label className="font-medium">Connect Hardware</Label>
                   </div>
-                  <Select value={selectedDevice} onValueChange={setSelectedDevice}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="MCR300-EMV-WR">MCR300-EMV-WR</SelectItem>
-                      <SelectItem value="MCR200">MCR200</SelectItem>
-                      <SelectItem value="ACR38">ACR38</SelectItem>
-                    </SelectContent>
-                  </Select>
                   
-                  {!isConnected ? (
+                  {devicesFound.length === 0 && !isScanning && (
+                    <Button 
+                      onClick={handleScanDevices}
+                      variant="tech"
+                      className="min-w-24"
+                    >
+                      Scan Devices
+                    </Button>
+                  )}
+                  
+                  {isScanning && (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tech-status"></div>
+                      <span className="text-sm">Scanning...</span>
+                    </div>
+                  )}
+                  
+                  {devicesFound.length > 0 && (
+                    <Select value={selectedDevice} onValueChange={setSelectedDevice}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {devicesFound.map((device) => (
+                          <SelectItem key={device} value={device}>{device}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  
+                  {devicesFound.length > 0 && !isConnected && (
                     <Button 
                       onClick={handleConnect} 
                       disabled={isConnecting}
@@ -189,7 +228,9 @@ const EmvReaderWriter = () => {
                     >
                       {isConnecting ? "Connecting..." : "Connect"}
                     </Button>
-                  ) : (
+                  )}
+                  
+                  {isConnected && (
                     <div className="flex items-center gap-2">
                       <Badge variant="success" className="bg-tech-success text-white">
                         <Check className="h-3 w-3 mr-1" />
@@ -484,13 +525,31 @@ const EmvReaderWriter = () => {
                 <CardTitle className="text-sm">License Status</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center">
-                  <Badge variant="success" className="bg-tech-success text-white mb-2">
-                    Valid
-                  </Badge>
-                  <p className="text-xs text-muted-foreground">
-                    HWID: 7G2FRG24EE4!FBE304BTHR
-                  </p>
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <Badge 
+                      variant={licenseValid ? "success" : "destructive"} 
+                      className={licenseValid ? "bg-tech-success text-white" : "bg-destructive text-white"}
+                    >
+                      {licenseValid ? "Valid" : "Disabled"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Label htmlFor="licenseKey" className="text-xs">License Key</Label>
+                    <Input
+                      id="licenseKey"
+                      type="text"
+                      value={licenseKey}
+                      onChange={(e) => handleLicenseKeyChange(e.target.value)}
+                      placeholder="Enter license key"
+                      className="text-xs font-mono"
+                    />
+                  </div>
+                  {licenseValid && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      HWID: 7G2FRG24EE4!FBE304BTHR
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
